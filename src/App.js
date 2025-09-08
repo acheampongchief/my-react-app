@@ -55,6 +55,13 @@ const NumList = () => {
     </div>
   );
 }
+const addFood = (props) => {
+  return (
+    <div>
+<button>add Food</button>
+    </div>
+  )
+}
 const Calories = (props) => {
   return(
     <div>
