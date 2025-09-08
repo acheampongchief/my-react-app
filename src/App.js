@@ -55,6 +55,27 @@ const NumList = () => {
     </div>
   );
 }
+const Calories = (props) => {
+  return(
+    <div>
+      <p>Calories</p>
+    </div>
+  )
+}
+const Protein = (props) => {
+  return (
+    <div>
+      <p>Protein</p>
+    </div>
+  )
+}
+const Fat = (props) => {
+  return (
+    <div>
+      <p>Fat</p>
+    </div>
+  )
+}
 const App = () => {
   return (
     <div>
