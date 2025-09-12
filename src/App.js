@@ -55,17 +55,43 @@ const NumList = () => {
     </div>
   );
 }
+const Greetings = () => {
+  return (
+    <div>
+      <h1>Welcome to Calorie Counter.</h1>
+    </div>
+  )
+}
+const addFood = (props) => {
+  const Food = [];
+  const handleClick = () => {
+    
+  }
+  return (
+     <div>
+     <button onClick = {handleClick} className= "" >Add Food</button>
+     </div>
+
+)
+}
 const addFood = (props) => {
   return (
     <div>
-<button>add Food</button>
+<button>Add Food</button>
     </div>
   )
 }
 const Calories = (props) => {
   return(
     <div>
-      <p>Calories</p>
+      <p className='border'>Calories</p>
+    </div>
+  )
+}
+const Carbs = (props) => {
+  return (
+    <div>
+      <h2>Carbs</h2>
     </div>
   )
 }
