@@ -1,3 +1,36 @@
+import React, { useState } from 'react';
+
+const CalorieGoal = () => {
+    const [calorieGoal, setCalorieGoal] = useState();
+    const handleChange = (event) => {
+        setCalorieGoal(event.target.value);
+    }
+    return(
+      <div>
+      <label htmlFor="calorieInput">Enter your Calorie Goal:</label>
+      <input
+        id="calorieInput"
+        type="integer"
+        value={calorieGoal}
+        onChange={handleChange}
+        placeholder="Type here..."
+      />
+        <p>Your Calorie Goal is: {calorieGoal} calories</p>
+    </div>
+    )
+}
+
+const UserName = () => {
+    const [userName, setuserName] = useState('');
+    const handleChange = (event) => {
+        setuserName(event.target.value);
+    }
+    return(
+    <div>
+        <label htmlFor="userNameInput">Your Name...</label>
+    </div>
+    )
+}
 const Carbs = ({ carbs }) => {
   return (
     <div>   

@@ -13,7 +13,7 @@ function CameraCapture() {
   return (
     <>
     <div>
-      <input
+      <input className='rounded-lg bg-blue-500 px-5 py-5 text-white'
         type="file"
         accept="image/*"
         capture="environment"
@@ -28,7 +28,7 @@ function CameraCapture() {
     </div>
 
     <div>
-      <button className='border '>Take Photo</button>
+      <button className='bg-blue-600 py-5 px-5 rounded-lg text-white'>Take Photo</button>
     </div>
     </>
   );
