@@ -35,10 +35,10 @@ const WelcomePage = () => {
 
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg">
         {/* User Name Input */}
-        <UserName onNameSet={setUserName} />
+        <UserName userName={userName} setUserName={setUserName} />
 
         {/* Calorie Goal Input */}
-        <CalorieGoal onGoalSet={setGoal} />
+        <CalorieGoal goal={goal} setGoal={setGoal} />
 
         {/* Start Button */}
         <button
