@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import CalorieGoal from "./calorieGoal";
+import UserName from "./userInfo";
 
+// Main component to display food nutrients and user inputs
 const FoodNutrients = ({ foodInfo }) => {
   const [goal, setGoal] = useState("");
   const [userName, setUserName] = useState("");
@@ -25,48 +28,6 @@ const FoodNutrients = ({ foodInfo }) => {
 
       {/* Calorie Summary */}
       <Calories calories={calories} goal={goal} userName={userName} />
-    </div>
-  );
-};
-
-/* ---------------- SUBCOMPONENTS ---------------- */
-
-// UserName input component
-const UserName = ({ onNameSet }) => {
-  const [name, setName] = useState("");
-  return (
-    <div className="mb-4">
-      <label className="block text-sm font-semibold mb-1">Enter your name:</label>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => {
-          setName(e.target.value);
-          onNameSet(e.target.value);
-        }}
-        className="w-full p-2 border border-orange-300 rounded-lg"
-        placeholder="e.g. Yaw"
-      />
-    </div>
-  );
-};
-
-// Calorie Goal input component
-const CalorieGoal = ({ onGoalSet }) => {
-  const [goal, setGoal] = useState("");
-  return (
-    <div className="mb-4">
-      <label className="block text-sm font-semibold mb-1">Enter your daily calorie goal:</label>
-      <input
-        type="number"
-        value={goal}
-        onChange={(e) => {
-          setGoal(e.target.value);
-          onGoalSet(e.target.value);
-        }}
-        className="w-full p-2 border border-orange-300 rounded-lg"
-        placeholder="e.g. 2000"
-      />
     </div>
   );
 };
@@ -112,3 +73,4 @@ const Calories = ({ calories, goal, userName }) => {
 };
 
 export default FoodNutrients;
+

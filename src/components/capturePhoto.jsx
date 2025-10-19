@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function CameraCapture({ onAnalysisComplete }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null); // ⬅️ NEW: store AI result
 
   const handleCapture = async (event) => {
     const file = event.target.files[0];
     if (file) {
       setImage(URL.createObjectURL(file));
+      setResult(null); // reset previous result
 
-      // Send image to backend
-      const formData = new FormData();
-      formData.append("image", file);
+      // Convert image to Base64 for AI analysis
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
 
-      setLoading(true);
-      try {
-        const response = await fetch("http://localhost:5000/analyze", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await response.json();
-        onAnalysisComplete(data); // Pass AI data up to parent
-      } catch (error) {
-        console.error("Error analyzing image:", error);
-      } finally {
-        setLoading(false);
-      }
+      reader.onloadend = async () => {
+        const base64Image = reader.result.split(",")[1];
+
+        setLoading(true);
+        try {
+          const response = await fetch("http://localhost:5000/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64Image }),
+          });
+
+          const data = await response.json();
+          setResult(data); // show result in this component
+          onAnalysisComplete?.(data); // ⬅️ optional chaining (safe callback)
+        } catch (error) {
+          console.error("Error analyzing image:", error);
+          setResult({ error: "Error analyzing image" });
+        } finally {
+          setLoading(false);
+        }
+      };
     }
   };
 
@@ -34,6 +44,8 @@ function CameraCapture({ onAnalysisComplete }) {
       <h2 className="text-3xl font-extrabold text-orange-600 mb-6 drop-shadow">
         🍓 Snap Your Meal!
       </h2>
+
+      {/* File input button */}
       <label className="cursor-pointer flex flex-col items-center bg-gradient-to-r from-pink-400 to-orange-400 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:scale-105 transition mb-6">
         <span className="mb-2 text-lg">Choose or Take a Photo</span>
         <input
@@ -45,7 +57,15 @@ function CameraCapture({ onAnalysisComplete }) {
         />
         <span className="text-2xl">📸</span>
       </label>
-      {loading && <p className="text-orange-500 font-semibold">Analyzing image...</p>}
+
+      {/* Loading indicator */}
+      {loading && (
+        <p className="text-orange-500 font-semibold animate-pulse">
+          Analyzing image...
+        </p>
+      )}
+
+      {/* Preview and result */}
       {image && (
         <div className="flex flex-col items-center mt-4">
           <h3 className="text-xl font-bold text-orange-500 mb-2">Preview:</h3>
@@ -54,6 +74,25 @@ function CameraCapture({ onAnalysisComplete }) {
             alt="Captured"
             className="rounded-2xl border-4 border-pink-300 shadow-md w-72 h-72 object-cover"
           />
+
+          {/* Display AI results */}
+          {result && !loading && (
+            <div className="mt-4 text-center">
+              {result.error ? (
+                <p className="text-red-500 font-semibold">{result.error}</p>
+              ) : (
+                <>
+                  <p className="text-lg font-semibold text-orange-600">
+                    🍽️ Food: <span className="font-bold">{result.food}</span>
+                  </p>
+                  <p className="text-lg font-semibold text-pink-600">
+                    🔥 Calories:{" "}
+                    <span className="font-bold">{result.calories} kcal</span>
+                  </p>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
