@@ -1,0 +1,10 @@
+# Ignore environment variable files
+.env
+
+# Ignore node modules (always a must for Node.js apps)
+node_modules/
+
+# Optional: ignore uploads or build folders
+uploads/
+dist/
+build/
