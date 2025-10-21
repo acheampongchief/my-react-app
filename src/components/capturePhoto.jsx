@@ -3,39 +3,35 @@ import React, { useState } from "react";
 function CameraCapture({ onAnalysisComplete }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null); // ⬅️ NEW: store AI result
+  const [result, setResult] = useState(null);
 
   const handleCapture = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setImage(URL.createObjectURL(file));
-      setResult(null); // reset previous result
+    if (!file) return;
 
-      // Convert image to Base64 for AI analysis
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+    setImage(URL.createObjectURL(file));
+    setResult(null);
+    setLoading(true);
 
-      reader.onloadend = async () => {
-        const base64Image = reader.result.split(",")[1];
+    try {
+      // Create a FormData object to send the image file
+      const formData = new FormData();
+      formData.append("image", file); // backend expects "image"
 
-        setLoading(true);
-        try {
-          const response = await fetch("http://localhost:5000/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: base64Image }),
-          });
+      // Send image file to backend
+      const response = await fetch("http://localhost:5000/analyze", {
+        method: "POST",
+        body: formData, // 👈 no need for headers when sending FormData
+      });
 
-          const data = await response.json();
-          setResult(data); // show result in this component
-          onAnalysisComplete?.(data); // ⬅️ optional chaining (safe callback)
-        } catch (error) {
-          console.error("Error analyzing image:", error);
-          setResult({ error: "Error analyzing image" });
-        } finally {
-          setLoading(false);
-        }
-      };
+      const data = await response.json();
+      setResult(data);
+      onAnalysisComplete?.(data); // optional callback to parent
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+      setResult({ error: "Error analyzing image" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,8 +83,17 @@ function CameraCapture({ onAnalysisComplete }) {
                   </p>
                   <p className="text-lg font-semibold text-pink-600">
                     🔥 Calories:{" "}
-                    <span className="font-bold">{result.calories} kcal</span>
+                    <span className="font-bold">
+                      {result.calories !== "Unknown"
+                        ? `${result.calories} kcal`
+                        : "Unknown"}
+                    </span>
                   </p>
+                  {result.confidence && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      Confidence: {result.confidence}
+                    </p>
+                  )}
                 </>
               )}
             </div>
