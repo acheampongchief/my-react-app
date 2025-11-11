@@ -18,15 +18,27 @@ function CameraCapture({ onAnalysisComplete }) {
       const formData = new FormData();
       formData.append("image", file); // backend expects "image"
 
-      // Send image file to backend
-      const response = await fetch("http://localhost:5000/analyze", {
+      // Send image file to backend (new endpoint)
+      const response = await fetch("http://localhost:5000/api/analyze-photo", {
         method: "POST",
         body: formData, // 👈 no need for headers when sending FormData
       });
 
       const data = await response.json();
-      setResult(data);
-      onAnalysisComplete?.(data); // optional callback to parent
+      // Normalize response for older code expecting `food`/`calories` keys
+      const normalized = {
+        food: data.foodName || data.food || 'Unknown',
+        calories: data.calories ?? data.calories === 0 ? data.calories : (data.calories === null ? 'Unknown' : data.calories),
+        confidence: data.confidence || null,
+        protein: data.protein ?? null,
+        carbs: data.carbs ?? null,
+        fat: data.fat ?? null,
+        rawLabels: data.rawLabels || [],
+        error: data.error || null,
+      };
+
+      setResult(normalized);
+      onAnalysisComplete?.(normalized); // optional callback to parent
     } catch (error) {
       console.error("Error analyzing image:", error);
       setResult({ error: "Error analyzing image" });
@@ -73,26 +85,54 @@ function CameraCapture({ onAnalysisComplete }) {
 
           {/* Display AI results */}
           {result && !loading && (
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center w-full max-w-md">
               {result.error ? (
                 <p className="text-red-500 font-semibold">{result.error}</p>
               ) : (
                 <>
-                  <p className="text-lg font-semibold text-orange-600">
-                    🍽️ Food: <span className="font-bold">{result.food}</span>
-                  </p>
-                  <p className="text-lg font-semibold text-pink-600">
-                    🔥 Calories:{" "}
-                    <span className="font-bold">
-                      {result.calories !== "Unknown"
-                        ? `${result.calories} kcal`
-                        : "Unknown"}
-                    </span>
-                  </p>
-                  {result.confidence && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      Confidence: {result.confidence}
+                  <div className="flex items-center justify-center gap-3">
+                    <p className="text-lg font-semibold text-orange-600">
+                      🍽️ Food: <span className="font-bold">{result.food}</span>
                     </p>
+                    {result.confidence && (
+                      <span className="text-sm px-2 py-1 rounded-full bg-indigo-600 text-white font-medium shadow">
+                        {result.confidence}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                    <div className="bg-white/60 rounded-lg p-2 shadow-sm">
+                      <div className="text-xs text-gray-500">Calories</div>
+                      <div className="font-bold text-pink-600">
+                        {result.calories && result.calories !== 'Unknown' ? `${result.calories} kcal` : 'Unknown'}
+                      </div>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-2 shadow-sm">
+                      <div className="text-xs text-gray-500">Protein</div>
+                      <div className="font-bold text-orange-600">{result.protein ?? '—'} g</div>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-2 shadow-sm">
+                      <div className="text-xs text-gray-500">Carbs</div>
+                      <div className="font-bold text-indigo-600">{result.carbs ?? '—'} g</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <div className="text-xs text-gray-500">Fat</div>
+                    <div className="font-semibold text-gray-700">{result.fat ?? '—'} g</div>
+                  </div>
+
+                  {/* Raw labels (optional) */}
+                  {result.rawLabels && result.rawLabels.length > 0 && (
+                    <div className="mt-3 text-left text-xs text-gray-600">
+                      <div className="font-medium mb-1">Raw labels</div>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {result.rawLabels.map((r, i) => (
+                          <li key={i}>{r.label} — {(r.confidence * 100).toFixed(1)}%</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </>
               )}

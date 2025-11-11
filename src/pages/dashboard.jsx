@@ -3,6 +3,7 @@ import  { useState } from "react";
 import CameraCapture from "../components/capturePhoto";
 import FoodNutrients from "../components/foodNutrients";
 import ProgressCircle from "../components/ProgressCircle";
+import Tab from '../components/tab';
 
 const DashboardPage = () => {
   const [foodInfo, setFoodInfo] = useState(null);
@@ -10,7 +11,8 @@ const DashboardPage = () => {
   const calories = foodInfo?.calories || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 p-6">
+    <div>
+      <Tab />
       <h1 className="text-3xl text-center font-bold text-orange-600 pt-6">
         🍎 Calorie Progress
       </h1>
